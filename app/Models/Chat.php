@@ -21,4 +21,8 @@ class Chat extends Model
             return User::firstWhere('id', $this->sender_id);
         }
     }
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
 }

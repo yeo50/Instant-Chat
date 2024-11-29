@@ -18,4 +18,8 @@ class Message extends Model
         'receiver_deleted_at',
         'body'
     ];
+    public function chat()
+    {
+        return $this->belongsTo(Chat::class);
+    }
 }

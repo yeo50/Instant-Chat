@@ -8,6 +8,7 @@
   new class extends Component {
       public $selectedChat;
       public $chats;
+      protected $listeners = ['chatListUpdate' => '$refresh'];
       public function mount()
       {
           $this->chats = auth()->user()->chats;
@@ -53,7 +54,7 @@
                           <a href="{{ route('chats.show', $chat->id) }}" class="col-span-11">
                               <div class="flex justify-between items-center ps-4">
                                   <h3 class="text-lg font-semibold">{{ $chat->getReceiver()->name }}</h3>
-                                  <small>5s</small>
+                                  <small>{{ $chat->messages?->last()?->created_at->shortAbsoluteDiffForHumans() }}</small>
                               </div>
                               <div class="flex items-center gap-1">
                                   {{-- single tick  --}}
@@ -65,9 +66,9 @@
                                       </svg>
                                   </span>
                                   <p class="text-xs md:text-sm truncate">
-                                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Cum, voluptas.
+                                      {{ $chat->messages?->last()?->body ?? '' }}
                                   </p>
-                                  <span class="px-2 rounded-full py-1.5 bg-blue-300 text-sm">5</span>
+                                  <span class="px-2 rounded-full py-1.5 bg-blue-300 text-sm ml-auto">5</span>
                               </div>
                           </a>
                           {{-- drop down  --}}

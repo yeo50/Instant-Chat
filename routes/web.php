@@ -13,6 +13,7 @@ Route::view('dashboard', 'dashboard')
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+Route::get('chats/{id}/send', [ChatController::class, 'send'])->name('chats.send');
 Route::resources(
     [
         'users' => UserController::class,

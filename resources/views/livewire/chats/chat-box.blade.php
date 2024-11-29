@@ -1,3 +1,11 @@
+<?php
+use Livewire\Volt\Component;
+use App\Models\User;
+use App\Models\Conversation;
+use Livewire\Attributes\On;
+new class extends Component {
+    public $selectedChat;
+}; ?>
 <section class="flex flex-col overflow-y-auto">
     <header class="flex items-center gap-4 px-2 lg:px-4  border-b sticky top-0 w-full py-2 z-10 bg-white">
         <a @click="chatList = true" href="#" class="shrink-0 md:hidden">
@@ -7,7 +15,7 @@
             </svg>
         </a>
         <x-avatar class="h-12 w-12" />
-        <h2>{{ auth()->user()->name }}</h2>
+        <h2>{{ $selectedChat->getReceiver()->email }}</h2>
     </header>
     {{-- body  --}}
     <main class="flex flex-col gap-3 p-2.5 flex-grow overflow-y-auto overscroll-contain overflow-x-hidden my-auto">

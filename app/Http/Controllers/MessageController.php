@@ -2,24 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Chat;
-use App\Http\Requests\StoreChatRequest;
-use App\Http\Requests\UpdateChatRequest;
+use App\Models\Message;
+use App\Http\Requests\StoreMessageRequest;
+use App\Http\Requests\UpdateMessageRequest;
 
-class ChatController extends Controller
+class MessageController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('chats.index');
+        //
     }
-    public function send($id)
-    {
 
-        return view('chats.index');
-    }
     /**
      * Show the form for creating a new resource.
      */
@@ -31,7 +27,7 @@ class ChatController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreChatRequest $request)
+    public function store(StoreMessageRequest $request)
     {
         //
     }
@@ -39,15 +35,15 @@ class ChatController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Chat $chat)
+    public function show(Message $message)
     {
-        return view('chats.show', ['chat' => $chat]);
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Chat $chat)
+    public function edit(Message $message)
     {
         //
     }
@@ -55,7 +51,7 @@ class ChatController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateChatRequest $request, Chat $chat)
+    public function update(UpdateMessageRequest $request, Message $message)
     {
         //
     }
@@ -63,7 +59,7 @@ class ChatController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Chat $chat)
+    public function destroy(Message $message)
     {
         //
     }

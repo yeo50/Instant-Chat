@@ -10,7 +10,7 @@
 
         <div class="h-full relative flex   md:w-[320px] xl:w-[400px] shrink-0 overflow-y-auto "
             :class="chatList ? 'w-full' : 'max-md:hidden'">
-            <livewire:chats.chat-list :selectedChat="$chat" />
+            <livewire:chats.chat-list :selectedChat="$chat" :id="$id" />
         </div>
 
         <div class="grid w-full h-full border-l-2 overflow-y-auto">

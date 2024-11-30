@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Chat;
 use App\Http\Requests\StoreChatRequest;
 use App\Http\Requests\UpdateChatRequest;
+use App\Models\Message;
 
 class ChatController extends Controller
 {
@@ -41,7 +42,10 @@ class ChatController extends Controller
      */
     public function show(Chat $chat)
     {
-        return view('chats.show', ['chat' => $chat]);
+        $meessagesToRead = Message::where('chat_id', $chat->id)->where('receiver_id', auth()->id())->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        return view('chats.show', ['chat' => $chat, 'id' => $chat->id]);
     }
 
     /**

@@ -25,4 +25,16 @@ class Chat extends Model
     {
         return $this->hasMany(Message::class);
     }
+    public function isLastMessageRead(): bool
+    {
+        $userId = auth()->id();
+        $message = $this->messages()->latest()->first();
+        if ($message) {
+            return $message->read_at !== null && $message->sender_id === $userId;
+        }
+    }
+    public function unReadCount()
+    {
+        return $messages = $this->messages()->where('receiver_id', auth()->id())->whereNull('read_at')->count();
+    }
 }

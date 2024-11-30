@@ -4,6 +4,8 @@ use App\Models\User;
 use App\Models\Message;
 use App\Models\Conversation;
 use Livewire\Attributes\On;
+use App\Notifications\MessageSent;
+use App\Notifications\MessageRead;
 new class extends Component {
     public $selectedChat;
     public $body;
@@ -13,6 +15,28 @@ new class extends Component {
     {
         $this->loadMessages();
     }
+
+    public function getListeners()
+    {
+        $auth_id = auth()->user()->id;
+        return ["echo-private:users.{$auth_id},.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated" => 'broadcastedNotifications'];
+    }
+    public function broadcastedNotifications($event)
+    {
+        if ($event['type'] == MessageSent::class) {
+            if ($event['chat_id'] == $this->selectedChat->id) {
+                $this->dispatch('scroll-bottom');
+                $newMessage = Message::find($event['message_id']);
+                $this->loadedMessages->push($newMessage);
+                $newMessage->read_at = now();
+                $newMessage->save();
+
+                // broadcast read
+                $this->selectedChat->getReceiver()->notify(new MessageRead($this->selectedChat->id));
+            }
+        }
+    }
+
     #[On('loadMore')]
     public function loadMore()
     {
@@ -39,6 +63,9 @@ new class extends Component {
         $this->selectedChat->updated_at = now();
         $this->selectedChat->save();
         $this->dispatch('chatListUpdate');
+
+        // broadcast
+        $this->selectedChat->getReceiver()->notify(new MessageSent(auth()->user(), $this->selectedChat, $newMessage, $this->selectedChat->getReceiver()->id));
     }
     public function loadMessages()
     {
@@ -53,7 +80,12 @@ new class extends Component {
 <section x-data="{ height: 0, chatEl: document.getElementById('chat'), markAsRead: null }" x-init="height = chatEl.scrollHeight;
 $nextTick(() => {
     chatEl.scrollTop = height
-})" class="flex flex-col overflow-y-auto">
+});
+Echo.private('users.{{ auth()->id() }}').notification((notification) => {
+    if (notification['type'] == 'App\\Notifications\\MessageRead' && notification['chat_id'] == {{ $selectedChat->id }}) {
+        markAsRead: true;
+    }
+});" class="flex flex-col overflow-y-auto">
     <button wire:click="loadMessages">click</button>
     <header class="flex items-center gap-4 px-2 lg:px-4  border-b sticky top-0 w-full py-2 z-10 bg-white">
         <a @click="chatList = true" href="#" class="shrink-0 md:hidden">

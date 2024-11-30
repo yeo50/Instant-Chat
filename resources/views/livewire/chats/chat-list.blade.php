@@ -9,7 +9,7 @@
       public $selectedChat;
       public $chats;
       public $id;
-      protected $listeners = ['chatListUpdate' => '$refresh'];
+      protected $listeners = ['chatListUpdate' => '$refresh', 'refresh' => '$refresh'];
       public function mount()
       {
           $this->chats = auth()->user()->chats;
@@ -26,7 +26,12 @@
       if (conversationElement) {
           conversationElement.scrollIntoView({ 'behavior': 'smooth', 'block': 'start' })
       }
-  }, 200);">
+  }, 200);
+  Echo.private('users.{{ auth()->id() }}').notification((notification) => {
+      if (notification['type'] == 'App\\Notifications\\MessageSent' || notification['type'] == 'App\\Notifications\\MessageRead') {
+          $wire.dispatch('refresh');
+      }
+  });">
 
       <h1></h1>
       <header class="border-b shadow-lg mb-1 sticky top-0 z-10">

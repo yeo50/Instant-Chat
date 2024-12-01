@@ -14,13 +14,38 @@
       {
           $this->chats = auth()->user()->chats;
       }
+      public function deleteChat($id)
+      {
+          $userId = auth()->id();
+          $chat = Chat::find(decrypt($id));
+          $chat->messages->each(function ($message) use ($userId) {
+              if ($message->sender_id == $userId) {
+                  $message->update(['sender_deleted_at' => now()]);
+              } elseif ($message->receiver_id == $userId) {
+                  $message->update(['receiver_deleted_at' => now()]);
+              }
+          });
+          $receiverDeletedChat = $chat
+              ->messages()
+              ->where(function ($query) use ($userId) {
+                  $query->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+              })
+              ->where(function ($query) use ($userId) {
+                  $query->whereNull('sender_deleted_at')->orWhereNull('receiver_deleted_at');
+              })
+              ->doesntExist();
+          if ($receiverDeletedChat) {
+              $chat->forceDelete();
+          }
+          return redirect()->route('chats.index');
+      }
       public function test()
       {
           $user = auth()->user();
           $chats = $user->chats; // Fetch the chats
       }
   }; ?>
-  <section class="overflow-hidden flex flex-col" x-data="{ type: 'all', id: @entangle('id') }" x-init="setTimeout(() => {
+  <section class="overflow-hidden flex flex-col transition-all h-full" x-data="{ type: 'all', id: @entangle('id') }" x-init="setTimeout(() => {
       conversationElement = document.getElementById('chat-' + id);
   
       if (conversationElement) {
@@ -54,13 +79,17 @@
                   :class="{ 'bg-blue-200': type == 'deleted' }">Deleted</div>
           </div>
       </header>
-      <main class="overflow-y-scroll overflow-auto border" style="contain: content">
-          <ul class="w-full space-y-2" style="contain: content">
+      <main class="overflow-y-scroll scrollbar-thin  h-full grow relative overflow-auto " style="contain: content">
+          <ul class="w-[calc(100%-8px)]   p-2 space-y-2 ">
               @foreach ($chats as $chat)
                   <li id="chat-{{ $chat->id }}" wire:key="{{ $chat->id }}"
-                      class="px-1 lg:px-2 py-1 lg:py-2 flex w-full rounded-sm my-auto gap-2 items-center {{ $selectedChat?->id == $chat->id ? 'bg-gray-300/70' : '' }}">
+                      class="px-1  lg:px-4 py-1 lg:py-2 flex w-full rounded-sm my-auto  gap-2 items-center {{ $selectedChat?->id == $chat->id ? 'bg-gray-300/70' : '' }}">
                       <a href="{{ route('chats.show', $chat->id) }}" class="shrink-0">
-                          <x-avatar class="w-10 h-10" />
+                          @if (isset($chat->getReceiver()->photo))
+                              <x-avatar src="{{ asset('storage/' . $chat->getReceiver()->photo) }}" class="w-8 h-8" />
+                          @else
+                              <x-avatar class="w-8 h-8" />
+                          @endif
                       </a>
                       <aside class="grid grid-cols-12 w-full items-center ps-1">
                           <a href="{{ route('chats.show', $chat->id) }}" class="col-span-11">
@@ -103,7 +132,7 @@
                           </a>
                           {{-- drop down  --}}
                           <div class=" col-span-1">
-                              <x-dropdown align="right" width="48">
+                              <x-dropdown align="custom" width="48">
                                   <x-slot name="trigger">
                                       <button
                                           class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400  hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
@@ -122,12 +151,9 @@
                                           {{ __('Profile') }}
                                       </x-dropdown-link>
 
-                                      <!-- Authentication -->
-                                      <button wire:click="logout" class="w-full text-start">
-                                          <x-dropdown-link>
-                                              {{ __('Log Out') }}
-                                          </x-dropdown-link>
-                                      </button>
+                                      <button onclick="confirm('are you sure') || event.stopImmediatePropagation()"
+                                          wire:click="deleteChat('{{ encrypt($chat->id) }}')"
+                                          class="text-center text-sm ps-4 text-gray-700 inline-flex items-center w-full hover:bg-gray-100 py-2">Delete</button>
                                   </x-slot>
                               </x-dropdown>
                           </div>

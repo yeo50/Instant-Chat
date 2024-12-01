@@ -56,8 +56,12 @@
                       <td class="text-start">{{ $user->email }}</td>
 
                       <td class="text-start">
-                          <img src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->name }}"
-                              class="block w-20 h-20">
+                          @if ($user->photo)
+                              <img src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->name }}"
+                                  class="block w-14 h-14 rounded-full">
+                          @else
+                              <x-avatar class="w-14 h-14" />
+                          @endif
                       </td>
                       <td class="text-start">
                           <button wire:click="startChat({{ $user->id }})" class="text-blue-600 ">Message</button>

@@ -86,7 +86,7 @@ Echo.private('users.{{ auth()->id() }}').notification((notification) => {
         markAsRead: true;
     }
 });" class="flex flex-col overflow-y-auto">
-    <button wire:click="loadMessages">click</button>
+
     <header class="flex items-center gap-4 px-2 lg:px-4  border-b sticky top-0 w-full py-2 z-10 bg-white">
         <a @click="chatList = true" href="#" class="shrink-0 md:hidden">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -94,7 +94,11 @@ Echo.private('users.{{ auth()->id() }}').notification((notification) => {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18" />
             </svg>
         </a>
-        <x-avatar class="h-12 w-12" />
+        @if (isset($selectedChat->getReceiver()->photo))
+            <x-avatar src="{{ asset('storage/' . $selectedChat->getReceiver()->photo) }}" class="w-8 h-8" />
+        @else
+            <x-avatar class="w-8 h-8" />
+        @endif
         <h2>{{ $selectedChat->getReceiver()->email }}</h2>
     </header>
     {{-- body  --}}
@@ -135,7 +139,12 @@ Echo.private('users.{{ auth()->id() }}').notification((notification) => {
                         'invisible' => $prevMessage?->sender_id === $loadedMessage->sender_id,
                         'hidden' => $loadedMessage->sender_id === auth()->id(),
                     ])>
-                        <x-avatar class="w-8 h-8" />
+                        @if (isset($selectedChat->getReceiver()->photo))
+                            <x-avatar src="{{ asset('storage/' . $selectedChat->getReceiver()->photo) }}"
+                                class="w-8 h-8" />
+                        @else
+                            <x-avatar class="w-8 h-8" />
+                        @endif
                     </div>
                     <div @class([
                         'flex flex-col gap-2 p-2.5 rounded-xl text-black text-[15px] ',
@@ -177,7 +186,7 @@ Echo.private('users.{{ auth()->id() }}').notification((notification) => {
     </main>
     <footer class="shrink-0 z-10 bg-white inset-x-0 pb-1 px-2">
         <form x-data="{ body: @entangle('body') }" @submit.prevent="$wire.sendMessage()" class="flex gap-3 ">
-            <x-text-input wire:model="body" class="grow" />
+            <x-text-input autofocus wire:model="body" class="grow" />
 
             <x-primary-button x-bind:disabled="!body.trim()">send</x-primary-button>
         </form>

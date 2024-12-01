@@ -49,7 +49,7 @@ class User extends Authenticatable
 
     public function chats()
     {
-        return $this->hasMany(Chat::class, 'sender_id')->orWhere('receiver_id', $this->id)->whereNull('deleted_at');
+        return $this->hasMany(Chat::class, 'sender_id')->orWhere('receiver_id', $this->id)->whereNotDeleted();
     }
     public function receivesBroadcastNotificationsOn(): string
     {

@@ -49,26 +49,32 @@
               </tr>
           </thead>
           <tbody>
-              @foreach ($users as $key => $user)
-                  <tr>
-                      <td class="text-start">{{ $key + 1 }}</td>
-                      <td class="text-start">{{ $user->name }}</td>
-                      <td class="text-start">{{ $user->email }}</td>
+              @if ($users)
 
-                      <td class="text-start">
-                          @if ($user->photo)
-                              <img src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->name }}"
-                                  class="block w-14 h-14 rounded-full">
-                          @else
-                              <x-avatar class="w-14 h-14" />
-                          @endif
-                      </td>
-                      <td class="text-start">
-                          <button wire:click="startChat({{ $user->id }})" class="text-blue-600 ">Message</button>
-                      </td>
+                  @foreach ($users as $key => $user)
+                      <tr>
+                          <td class="text-start">{{ $key + 1 }}</td>
+                          <td class="text-start">{{ $user->name }}</td>
+                          <td class="text-start">{{ $user->email }}</td>
 
-                  </tr>
-              @endforeach
+                          <td class="text-start">
+                              @if ($user->photo)
+                                  <img src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->name }}"
+                                      class="block w-14 h-14 rounded-full">
+                              @else
+                                  <x-avatar class="w-14 h-14" />
+                              @endif
+                          </td>
+                          <td class="text-start">
+                              <button wire:click="startChat({{ $user->id }})"
+                                  class="text-blue-600 ">Message</button>
+                          </td>
+                      </tr>
+                  @endforeach
+              @else
+                  <h1 class="text-center font-semibold px-3 py-3 text-xl tracking-wide">No User found</h1>
+
+              @endif
           </tbody>
 
       </table>

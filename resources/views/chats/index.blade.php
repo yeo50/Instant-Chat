@@ -14,7 +14,7 @@
         </div>
 
         <div class="grid w-full h-full place-items-center border-l-2 overflow-y-auto">
-            <div> <a href="{{ route('users.index') }}" class="text-lg font-semibold text-blue-800">Choose a
+            <div> <a href="{{ route('dashboard') }}" class="text-lg font-semibold text-blue-800">Choose a
                     conversation</a></div>
         </div>
 
